@@ -1,0 +1,31 @@
+﻿@model BookingApp.WebApp.ViewModels.AssetCatalogDetailsViewModel
+@{
+    ViewData["Title"] = "Asset Details";
+}
+
+<h3 id="PageTitle">Asset - details</h3>
+
+<table class="table">
+    <tbody>
+        <tr>
+            <td width="150">AssetID: </td>
+            <td><b>@Model.Asset.AssetId</b></td>
+        </tr>
+        <tr>
+            <td width="150">Name: </td>
+            <td><b>@Model.Asset.Name</b></td>
+        </tr>
+        <tr>
+            <td width="150">Type: </td>
+            <td><b>@Model.Asset.Type</b></td>
+        </tr>
+        <tr>
+            <td width="150">Description:</td>
+            <td><b>@Model.Asset.Description</b></td>
+        </tr>
+    </tbody>
+</table>
+<span><a id="BackButton" asp-action="Index" asp-controller="AssetCatalogManagement" class="btn btn-default">Back</a></span>
+
+
+

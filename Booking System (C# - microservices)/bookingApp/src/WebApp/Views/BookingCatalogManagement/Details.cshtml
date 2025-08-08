@@ -1,0 +1,31 @@
+﻿@model BookingApp.WebApp.ViewModels.BookingCatalogDetailsViewModel
+@{
+    ViewData["Title"] = "Booking Details";
+}
+
+<h3 id="PageTitle">Booking - details</h3>
+
+<table class="table">
+    <tbody>
+        <tr>
+            <td width="150">Asset: </td>
+            <td><b><a href='@(Url.Action("Details", "AssetCatalogManagement", new { id = Model.Booking.AssetId }))'>@Model.Asset</a></b></td>
+        </tr>
+        <tr>
+            <td width="150">Owner: </td>
+            <td><b><a href='@(Url.Action("Details", "CustomerManagement", new { id = Model.Booking.CustomerId }))'>@Model.Owner</a></b></td>
+        </tr>
+        <tr>
+            <td width="150">Start Time: </td>
+            <td><b>@Model.Booking.StartTime</b></td>
+        </tr>
+        <tr>
+            <td width="150">End Time: </td>
+            <td><b>@Model.Booking.EndTime</b></td>
+        </tr>
+    </tbody>
+</table>
+<span><a id="BackButton" asp-action="Index" asp-controller="BookingCatalogManagement" class="btn btn-default">Back</a></span>
+
+
+

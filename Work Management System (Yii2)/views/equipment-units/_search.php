@@ -1,0 +1,51 @@
+<?php
+
+use yii\helpers\Html;
+use app\widgets\ActiveForm;
+
+/* @var $this yii\web\View */
+/* @var $model app\models\EquipmentUnit */
+/* @var $form yii\widgets\ActiveForm */
+
+\app\assets\Select2aAsset::register($this);
+$js = <<< JS
+    $('.search-block .select2').select2();
+JS;
+$this->registerJs($js);
+
+?>
+
+
+<div class="form-search">
+
+    <?php
+    $form = ActiveForm::begin([
+        'action' => ['index'],
+        'method' => 'get',
+    ]); ?>
+
+    <div class="row search-block">
+
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <?= $form->field($model, 'name')->textInput(['maxlength' => true]) ?>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <?= $form->field($model, 'category_id')->dropDownList(\app\models\EquipmentCategory::listAll('id', 'name'), ['prompt' => 'Все', 'class' => 'form-select select2']) ?>
+        </div>
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <?= $form->field($model, 'pages')->dropDownList(\app\models\EquipmentUnit::PAGE_NAMES, ['prompt' => 'Все', 'class' => 'form-select select2', 'multiple' => 1]) ?>
+        </div>
+
+        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12">
+            <div class="form-group">
+                <label for="" class="control-label">&nbsp;</label>
+                <div class="input-group0">
+                    <?= Html::submitButton('<i class="fa fa-trash"></i>', ['class' => 'btn btn-default btn-outline-dark', 'title' => 'Очистить', 'onclick' => "var form = jQuery(this.form); form.find('input[type=text]').val(''); form.find('select').val(0); return true;"]) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php ActiveForm::end(); ?>
+    <hr/>
+</div>
