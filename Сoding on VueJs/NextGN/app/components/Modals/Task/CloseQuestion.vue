@@ -1,0 +1,280 @@
+<template>
+  <div
+    class="task-container mb-2"
+    :style="`display:${(question.isNested && !question.isVisible) ? 'none' : 'block'}`"
+  >
+    <p
+      :class="{ 'not_active': close }"
+      class="modal__sub-title modal__sub-title--no-padding"
+    >
+      Кейс {{ index }}
+    </p>
+    <p v-if="question.isNested">
+      {{ question.triggerTitle }}
+    </p>
+    <div v-if="question.file">
+      <div v-if="isImage(question.file)">
+        <img
+          :src="`/storage/images/${question.file}`"
+          style="max-width: 100%;"
+        >
+      </div>
+      <div v-else-if="isVideo(question.file)">
+        <video
+          controls
+          style="width: 100%;height:300px;"
+        >
+          <source
+            :src="`/storage/images/${question.file}`"
+            type="video/mp4"
+          >
+        </video>
+      </div>
+    </div>
+    <p
+      :class="{ 'not_active': close }"
+      class="modal__info modal__info--line-break ql-editor"
+      v-html="question.question"
+    />
+    <div class="modal__task-fields">
+      <div class="modal__task-grid">
+        <div
+          v-for="answer in question.values"
+          :key="answer.id"
+          class="modal__task-item"
+        >
+          <div
+            class="input-radio"
+            tabindex="0"
+            @keydown="e => onKeyDown(e, answer.id)"
+          >
+            <label>
+              <input
+                :id="`choose-one-${answer.id}`"
+                ref="input"
+                v-model="$v.selectedAnswer.$model"
+                :value="answer.id"
+                type="radio"
+                :disabled="close"
+                @change="getEvent(answer, question)"
+              >
+              <div class="checkbox" />
+              <span :style="{ color: close ? '#b3b3b3' : '' }">{{ answer.value }}</span>
+            </label>
+          </div>
+        </div>
+      </div>
+      <p
+        v-if="invalid && !$v.selectedAnswer.required"
+        class="invalid__text"
+        style="margin-top: 0.6rem;"
+      >
+        Обязательно к заполнению
+      </p>
+    </div>
+    <Input
+      ref="comment"
+      v-model="comment"
+      title="Комментарий"
+      :is-required="getNewRecomendet && !close"
+      no-margin-bottom
+      :is-disabled="close"
+    />
+  </div>
+</template>
+
+<script>
+import { requiredIf } from 'vuelidate/lib/validators'
+import Input from '@app/elements/Input'
+
+export default {
+  name: 'ModalTaskCloseQuestion',
+  components: {
+    Input
+  },
+  props: {
+    index: Number,
+    close: Boolean,
+    question: Object,
+    task: Object
+  },
+  data() {
+    return {
+      selectedAnswer: null,
+      comment: null
+    }
+  },
+  computed: {
+    invalid() {
+      return this.$v.selectedAnswer.$dirty && this.$v.selectedAnswer.$invalid
+    },
+    invalidComment() {
+      return this.$v.comment.$dirty && this.$v.comment.$invalid
+    },
+    getNewRecomendet() {
+      return this.question.values.find(answer => answer.id === this.selectedAnswer)?.isCommentRequired
+    }
+  },
+  watch: {
+    comment() {
+      if (this.comment.trim() === '') {
+        this.comment = ''
+      }
+    },
+    close() {
+      this.selectedAnswer = null
+    },
+    question: {
+      handler: function(newValue, oldValue) {
+        if (newValue.selectedAnswer !== oldValue.selectedAnswer) {
+          this.selectedAnswer = newValue.selectedAnswer
+        }
+      },
+      deep: true
+    }
+  },
+  beforeMount() {
+    if (this.question && this.question.answers) {
+      let item = this.question.answers.find((item) => item.task_question_id === this.question.id)
+      this.selectedAnswer = item ? item.answer : null
+      this.comment = item ? item.comment : null
+    }
+  },
+  methods: {
+    closeModalTask() {
+      this.$window.$.magnificPopup.close({
+        items: {
+          src: `#task-modal-${this.task.id}`
+        }
+      })
+
+      setTimeout(()=>{
+        this.$window.$.magnificPopup.open({
+          items: {
+            src: `#report-modal-${this.task.product_id}`
+
+          },
+          callbacks: {
+            close: () => {
+              this.reopenTask()
+            }
+          }
+        })
+      },500)
+
+      this.goCloseButton()
+    },
+    reopenTask() {
+      setTimeout(()=>{
+        this.$window.$.magnificPopup.open({
+          items: {
+            src: `#task-modal-${this.task.id}`
+          }
+        })
+      },500)
+
+      this.goCloseButton()
+    },
+    goCloseButton() {
+      setTimeout(()=>{
+        const element = document.querySelector('.mfp-wrap.mfp-close-btn-in.mfp-auto-cursor.mfp-ready')
+        if (element) {
+          element.classList.remove('mfp-close-btn-in', 'mfp-auto-cursor')
+          element.classList.add('mfp-zoom-in')
+          element.classList.add('mfp-ready')
+        }
+      },600)
+    },
+    isImage(filename) {
+      const extension = filename.split('.').pop().toLowerCase()
+
+      return (extension === 'jpg' || extension === 'jpeg' || extension === 'png' || extension === 'gif')
+    },
+    isVideo(filename) {
+      const extension = filename.split('.').pop().toLowerCase()
+
+      return (extension === 'mp4' || extension === 'avi' || extension === 'mkv' || extension === 'mov')
+    },
+    getEvent(answer, q) {
+      if (q.isTrigger) {
+        for (let nestedQuestion in q.nestedQuestions) {
+          if (q.nestedQuestions[nestedQuestion] !== q.nestedQuestions[answer.id]) {
+            this.$emit('get-answer', {
+              questionId: q.nestedQuestions[nestedQuestion],
+              isVisible: false,
+              sorting: q.sorting,
+              case: null
+            })
+          }
+        }
+        if (answer.isParentAnswer) {
+          this.$emit('get-answer', {
+            questionId: q.nestedQuestions[answer.id],
+            isVisible: true,
+            sorting: q.sorting,
+            case: this.index
+          })
+        } else {
+          this.$emit('get-answer', {
+            questionId: q.nestedQuestions[answer.id],
+            isVisible: false,
+            sorting: q.sorting,
+            case: null
+          })
+        }
+      }
+
+      if (answer.error) {
+
+        this.closeModalTask()
+
+        let data = {
+          task_id: this.task.id,
+          questionId: q.id
+        }
+
+        this.$emit('error-report', data)
+      }
+
+      const payload = {
+        answer,
+        q
+      }
+      this.$emit('updateSelectedAnswer', { questionId: q.id, selectedAnswer: this.selectedAnswer })
+      this.$emit('close-event', payload)
+    },
+    onKeyDown(e, answerId) {
+      if (e.keyCode === 13) {
+        e.preventDefault()
+        const ref = this.$refs.input.find(ref => ref.id === `choose-one-${answerId}`)
+        ref.click()
+      }
+    },
+    touchComment() {
+      this.$refs.comment.$v.$touch()
+
+      return !this.$refs.comment.$v.$invalid
+    },
+    getData() {
+      return {
+        task_question_id: this.question.id,
+        answer: this.selectedAnswer,
+        comment: this.comment,
+        close: !this.close
+      }
+    }
+  },
+  validations: {
+    selectedAnswer: {
+      required: requiredIf(function() {
+        return !this.close
+      })
+    },
+    comment: {
+      required: requiredIf(function() {
+        return this.getNewRecomendet
+      })
+    }
+  }
+}
+</script>

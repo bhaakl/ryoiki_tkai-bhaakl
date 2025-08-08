@@ -1,0 +1,13 @@
+global using BookingApp.CustomerManagementAPI.Commands;
+global using BookingApp.CustomerManagementAPI.Events;
+global using BookingApp.CustomerManagementAPI.Model;
+global using BookingApp.CustomerManagementAPI.DataAccess;
+global using BookingApp.CustomerManagementAPI.Mappers;
+global using BookingApp.Infrastructure.Messaging;
+global using BookingApp.Infrastructure.Messaging.Configuration;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.EntityFrameworkCore.Infrastructure;
+global using Serilog;
+global using Polly;
+global using Microsoft.OpenApi.Models;
+global using Microsoft.AspNetCore.Mvc;

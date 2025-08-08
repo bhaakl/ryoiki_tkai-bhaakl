@@ -1,0 +1,13 @@
+global using WebApp.RESTClients;
+global using BookingApp.WebApp.Models;
+global using BookingApp.WebApp.ViewModels;
+global using BookingApp.WebApp.Mappers;
+global using BookingApp.WebApp.Commands;
+global using BookingApp.Infrastructure.Messaging;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.Rendering;
+global using System.ComponentModel.DataAnnotations;
+global using System.Net;
+global using Serilog;
+global using Polly;
+global using Refit;

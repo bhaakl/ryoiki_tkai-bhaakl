@@ -1,0 +1,28 @@
+﻿@model BookingApp.WebApp.ViewModels.AssetCatalogViewModel
+@{
+    ViewData["Title"] = "Assets Overview";
+}
+<h3 id="PageTitle">Assets - overview</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var asset in Model.Assets)
+        {
+            <tr class="clickable" onclick="location.href = '@(Url.Action("Details", "AssetCatalogManagement", new { id = asset.AssetId }))'">
+                <td>@asset.Name</td>
+                <td>@asset.Type</td>
+                <td>@asset.Description</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<a id="RegisterAssetButton" asp-action="New" asp-controller="AssetCatalogManagement" class="btn btn-default">Register asset</a>
+
+

@@ -1,0 +1,28 @@
+﻿@model BookingApp.WebApp.ViewModels.BookingCatalogViewModel
+@{
+    ViewData["Title"] = "Booking Overview";
+}
+<h3 id="PageTitle">Booking - overview</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>BookingId</th>
+            <th>Start Time</th>
+            <th>End Time</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var booking in Model.Bookings)
+        {
+            <tr class="clickable" onclick="location.href = '@(Url.Action("Details", "BookingCatalogManagement", new { id = booking.BookingId }))'">
+                <td>@booking.BookingId</td>
+                <td>@booking.StartTime</td>
+                <td>@booking.EndTime</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<a id="RegisterBookingButton" asp-action="New" asp-controller="BookingCatalogManagement" class="btn btn-default">Register Booking</a>
+
